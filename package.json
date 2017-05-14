@@ -1,0 +1,26 @@
+{
+  "name": "devmetrics",
+  "version": "0.0.1",
+  "description": "Developer metrics web service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ameily/devmetrics.git"
+  },
+  "author": "Adam Meily",
+  "license": "BSD 2-Clause License",
+  "bugs": {
+    "url": "https://github.com/ameily/devmetrics/issues"
+  },
+  "homepage": "https://github.com/ameily/devmetrics#readme",
+  "dependencies": {
+    "convict": "^3.0.0",
+    "moment": "^2.18.1",
+    "request": "^2.81.0",
+    "request-promise-native": "^1.0.4",
+    "url-join": "^2.0.1"
+  }
+}

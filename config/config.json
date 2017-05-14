@@ -1,0 +1,12 @@
+{
+  // Gitlab server information
+  "gitlab": {
+    // Gitlab server url
+    "url": "https://gitlab.mycompany.com",
+    // Gitlab private token
+    "privateToken": "TODO"
+  },
+  "elastic": {
+    "url": "http://es.mycompany.com:9200"
+  }
+}

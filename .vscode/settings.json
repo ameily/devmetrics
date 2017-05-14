@@ -1,0 +1,12 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.rulers": [
+        80
+    ],
+    "editor.lineNumbers": "on",
+    "files.insertFinalNewline": true,
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true
+}

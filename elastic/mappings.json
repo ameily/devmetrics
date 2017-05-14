@@ -1,0 +1,122 @@
+{
+  "SubmissionBounce": {
+    "properties": {
+      "ProjectPath": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "ProjectGroup": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "SubmissionType": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "Url": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "Author": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "SubmissionDate": {
+        "type": "date"
+      },
+      "DaysSinceSubmission": {
+        "type": "double"
+      },
+      "Reason": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Timestamp": {
+        "type": "date"
+      },
+      "Title": {
+        "type": "string",
+        "index": "not_analyzed"
+      }
+    }
+  },
+
+  "Submission": {
+    "properties": {
+      "ProjectPath": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "ProjectGroup": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "SubmissionType": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "Url": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "Author": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "SubmissionDate": {
+        "type": "date"
+      },
+      "Timestamp": {
+        "type": "date"
+      },
+      "Title": {
+        "type": "string",
+        "index": "not_analyzed"
+      }
+    }
+  },
+
+  "SubmissionRejection": {
+    "properties": {
+      "ProjectPath": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "ProjectGroup": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "SubmissionType": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "Url": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "Author": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "SubmissionDate": {
+        "type": "date"
+      },
+      "Timestamp": {
+        "type": "date"
+      },
+      "Title": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "DaysSinceSubmission": {
+        "type": "double"
+      }
+    }
+  }
+}
