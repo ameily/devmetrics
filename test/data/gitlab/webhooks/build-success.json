@@ -1,0 +1,42 @@
+{
+  "object_kind":"build",
+  "ref":"master",
+  "tag":false,
+  "before_sha":"5f5014cd8206de6a747ad83149a4c92967f1598f",
+  "sha":"5f5014cd8206de6a747ad83149a4c92967f1598f",
+  "build_id":992,
+  "build_name":"job1",
+  "build_stage":"test",
+  "build_status":"success",
+  "build_started_at":"2016-06-23 19:15:32 UTC",
+  "build_finished_at":"2016-06-23 19:15:34 UTC",
+  "build_duration":2.356235747,
+  "build_allow_failure":false,
+  "project_id":82,
+  "project_name":"Adam Meily / TestProject",
+  "user":{
+    "id":6,
+    "name":"Adam Meily",
+    "email":"meilya@ainfosec.com"
+  },
+  "commit":{
+    "id":1266,
+    "sha":"5f5014cd8206de6a747ad83149a4c92967f1598f",
+    "message":"fix build script\n",
+    "author_name":"Adam Meily",
+    "author_email":"meilya@ainfosec.com",
+    "status":"success",
+    "duration":2,
+    "started_at":"2016-06-23 19:15:32 UTC",
+    "finished_at":"2016-06-23 19:15:34 UTC"
+  },
+  "repository":{
+    "name":"TestProject",
+    "url":"git@gitlab.ais:meilya/testproject.git",
+    "description":"",
+    "homepage":"https://gitlab.ais/meilya/testproject",
+    "git_http_url":"https://gitlab.ais/meilya/testproject.git",
+    "git_ssh_url":"git@gitlab.ais:meilya/testproject.git",
+    "visibility_level":0
+  }
+}

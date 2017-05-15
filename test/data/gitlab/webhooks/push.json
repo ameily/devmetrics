@@ -1,0 +1,61 @@
+{
+   "object_kind":"push",
+   "event_name":"push",
+   "before":"5c73f27b85b0c59d41765ae8b19580fe9e430ac7",
+   "after":"eaa2c94dddd5d74575c8bcc1311f4bc4329c29db",
+   "ref":"refs/heads/branch2",
+   "checkout_sha":"eaa2c94dddd5d74575c8bcc1311f4bc4329c29db",
+   "message":null,
+   "user_id":6,
+   "user_name":"Adam Meily",
+   "user_email":"meilya@ainfosec.com",
+   "user_avatar":"https://example.gitlab.lan/uploads/user/avatar/6/walter.jpg",
+   "project_id":82,
+   "project":{
+      "name":"TestProject",
+      "description":"",
+      "web_url":"https://example.gitlab.lan/meilya/testproject",
+      "avatar_url":null,
+      "git_ssh_url":"git@example.gitlab.lan:meilya/testproject.git",
+      "git_http_url":"https://example.gitlab.lan/meilya/testproject.git",
+      "namespace":"meilya",
+      "visibility_level":0,
+      "path_with_namespace":"meilya/testproject",
+      "default_branch":"master",
+      "homepage":"https://example.gitlab.lan/meilya/testproject",
+      "url":"git@example.gitlab.lan:meilya/testproject.git",
+      "ssh_url":"git@example.gitlab.lan:meilya/testproject.git",
+      "http_url":"https://example.gitlab.lan/meilya/testproject.git"
+   },
+   "commits":[
+      {
+         "id":"eaa2c94dddd5d74575c8bcc1311f4bc4329c29db",
+         "message":"an additional commit message\n\nSome extra long body\n",
+         "timestamp":"2016-06-21T19:43:54-04:00",
+         "url":"https://example.gitlab.lan/meilya/testproject/commit/eaa2c94dddd5d74575c8bcc1311f4bc4329c29db",
+         "author":{
+            "name":"Adam Meily",
+            "email":"meilya@ainfosec.com"
+         },
+         "added":[
+
+         ],
+         "modified":[
+            "Redmine"
+         ],
+         "removed":[
+
+         ]
+      }
+   ],
+   "total_commits_count":1,
+   "repository":{
+      "name":"TestProject",
+      "url":"git@example.gitlab.lan:meilya/testproject.git",
+      "description":"",
+      "homepage":"https://example.gitlab.lan/meilya/testproject",
+      "git_http_url":"https://example.gitlab.lan/meilya/testproject.git",
+      "git_ssh_url":"git@example.gitlab.lan:meilya/testproject.git",
+      "visibility_level":0
+   }
+}
