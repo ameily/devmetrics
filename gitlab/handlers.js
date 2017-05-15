@@ -1,14 +1,15 @@
 
+
+
+
 var config = require('../config');
 var urljoin = require('url-join');
 var request = require('request-promise-native');
-var moment = require('moment');
-
-var MS_PER_DAY = 86400000;
+var models = require('../models');
 
 var BOUNCE_ACTIONS = [{
   reason: "Needs more information",
-  pattern: /^\\info\b(.*)$/
+  pattern: /^\\needs-info\b(.*)$/
 }, {
   reason: "Incomplete",
   pattern: /^\\incomplete\b(.*)$/
@@ -24,11 +25,12 @@ var BOUNCE_ACTIONS = [{
 }];
 var REJECT_PATTERN = /^\\reject\b(.*)$/;
 
-var KNOWN_NOTEABLE_TYPES = [
-  'MergeRequest', 'Issue'
-];
-
-
+/**
+ * Query the Gitlab server for a specific user id.
+ *
+ * @param {Number} userId - The user id to query
+ * @return {Promise} A promise that will resolve the Gitlab user object.
+ */
 function getGitlabUser(userId) {
   var url = urljoin(config.get('gitlab.url'), "/api/v4/users", userId);
 
@@ -40,94 +42,129 @@ function getGitlabUser(userId) {
   });
 }
 
+/**
+ * Actions to perform on a submission.
+ *
+ * @typedef {Object} SubmissionActions
+ * @prop {SubmissionAction[]} bounce - Bounce actions.
+ * @prop {SubmissionAction[]} reject - Rejection actions.
+ */
 
-function bounceSubmission(note, author, reason, message) {
-  //TODO: get project name: ProjectPath, ProjectGroup
-  var obj = note.merge_request || note.issue;
-  var elapsed = moment(note.created_at).diff(moment(obj.created_at)) / MS_PER_DAY;
+/**
+ * A single action to perform on a submission.
+ *
+ * @typedef {Object} SubmissionAction
+ * @prop {String} reason - The reason for the action.
+ * @prop {String} message - The user-supplied message justifying the action.
+ */
 
-  return {
-    _type: 'SubmissionBounce',
-    SubmissionType: note.object_attributes.noteable_type,
-    Timestamp: note.object_attributes.created_at,
-    Title: obj.title,
-    Url: note.object_attributes.url,
-    SubmissionDate: obj.created_at,
-    DaysSinceSubmission: elapsed,
-    Author: author,
-    Reason: reason,
-    Message: message
+/**
+ * Parse a text block and identify actions.
+ *
+ * @param {String} text - Text to parse.
+ * @return {SubmissionActions} The parsed actions.
+ */
+function parseActions(text) {
+  var actions = {
+    bounce: [],
+    reject: []
   };
-}
 
-function createSubmission(body, submissionType) {
-  var author = body.user.username;
-  return {
-    _type: 'Submission',
-    SubmissionType: submissionType,
-    Timestamp: body.object_attributes.created_at,
-    Title: body.object_attributes.title,
-    Url: body.object_attributes.url,
-    SubmissionDate: body.object_attributes.created_at,
-    Author: author
-  }
-}
-
-function handleNote(note) {
-  var bounceReasons = [];
-  var rejections = [];
-  var obj = note.merge_request || note.issue;
-
-  var attrs = note.object_attributes;
-  if(attrs.created_at != attrs.updated_at) {
-    return null;
-  }
-
-  if(!obj) {
-    return null;
-  }
-
-  note.object_attributes.note.split('\n').forEach((line) => {
-    BOUNCE_ACTIONS.forEach((action) => {
-      var match = action.pattern.exec(line);
+  text.split('\n').forEach((line) => {
+    BOUNCE_ACTIONS.forEach((bounceAction) => {
+      var match = bounceAction.pattern.exec(line);
       if(match) {
-        bounceReasons.push({
-          reason: action.reason,
+        actions.bounce.push({
+          reason: bounceAction.reason,
           message: match[1].trim()
         });
       }
     });
+
+    var match = REJECT_PATTERN.exec(line);
+    if(match) {
+      actions.reject.push({
+        message: match[1].trim()
+      });
+    }
   });
 
-  if(bounceReasons.length == 0) {
+  return actions;
+}
+
+
+
+function handleNote(webhook) {
+  var submission = webhook.merge_request || webhook.issue;
+  var actions;
+
+  var note = webhook.object_attributes;
+  if(note.created_at != note.updated_at) {
+    return null;
+  }
+
+  if(!submission) {
+    return null;
+  }
+
+  actions = parseActions(note.note);
+
+  if(!actions.bounce.length && !actions.reject.length) {
     return;
   }
 
-  getGitlabUser(obj.author_id).then(function(author) {
-    var bounces = bounceReasons.map((bounce) => {
-      return bounceAction(note, user.username, bounce.reason, bounce.message);
+  getGitlabUser(submission.author_id).then(function(author) {
+    var bounces = actions.bounce.map((bounce) => {
+      return models.createSubissionBounce({
+        note: note,
+        author: author,
+        reason: bounce.reason,
+        message: bounce.message,
+        project: webhook.project,
+        submission: submission,
+        submissionType: note.noteable_type
+      });
+    });
+
+    var rejects = actions.reject.map((reject) => {
+      //TODO
+      return reject;
     });
 
     //TODO send to elastic
+    if(bounces.length) {
+      console.log("bounces: %s", bounces);
+    }
+
+    if(rejects.length) {
+      console.log("rejects: %s", rejects);
+    }
   });
 }
 
-function handleMergeRequest(mergeRequest) {
-  if(mergeRequest.object_attributes.action != 'open') {
+function handleMergeRequest(webhook) {
+  if(webhook.object_attributes.action != 'open') {
     return;
   }
 
-  var submission = createSubmission(issue, 'MergeRequest');
+  var submission = models.createSubmission({
+    webhook: webhook,
+    submissionType: "MergeRequest"
+  });
   //TODO send to elastic
+  console.log("submission: %s", submission);
 }
 
-function handleIssue(issue) {
-  if(issue.object_attributes.action != 'open') {
+function handleIssue(webhook) {
+  if(webhook.object_attributes.action != 'open') {
     return;
   }
 
-  var submission = createSubmission(issue, 'Issue');
-  //TODO send to elastic
+  var submission = models.createSubmission({
+    webhook: webhook,
+    submissionType: "Issue"
+  });
+  console.log("submission: %s", submission);
 }
 
 function handleWebhook(body) {
@@ -139,3 +176,6 @@ function handleWebhook(body) {
     handleIssue(body);
   }
 }
+
+
+exports.handleWebhook = handleWebhook;
