@@ -6,6 +6,7 @@ var config = require('../config');
 var urljoin = require('url-join');
 var request = require('request-promise-native');
 var models = require('../models');
+var api = require('./api');
 
 var BOUNCE_ACTIONS = [{
   reason: "Needs more information",
@@ -24,23 +25,6 @@ var BOUNCE_ACTIONS = [{
   pattern: /^\\quality\b(.*)$/
 }];
 var REJECT_PATTERN = /^\\reject\b(.*)$/;
-
-/**
- * Query the Gitlab server for a specific user id.
- *
- * @param {Number} userId - The user id to query
- * @return {Promise} A promise that will resolve the Gitlab user object.
- */
-function getGitlabUser(userId) {
-  var url = urljoin(config.get('gitlab.url'), "/api/v4/users", userId);
-
-  return request(url, {
-    qs: {
-      private_token: config.get('gitlab.privateToken')
-    },
-    json: true
-  });
-}
 
 /**
  * Actions to perform on a submission.
@@ -113,7 +97,7 @@ function handleNote(webhook) {
     return;
   }
 
-  getGitlabUser(submission.author_id).then(function(author) {
+  api.getGitlabUser(submission.author_id).then(function(author) {
     var bounces = actions.bounce.map((bounce) => {
       return models.createSubissionBounce({
         note: note,
