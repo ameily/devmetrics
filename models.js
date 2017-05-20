@@ -36,6 +36,8 @@ var MS_PER_DAY = 86400000;
  * @param {String} props.message - The message of the bounce.
  * @param {String} props.submissionType - The submission type, either "Issue" or
  *  "MergeRequest".
+ * @param {Boolean} props.rejection - The bounce rejects the submission
+ *  completely.
  * @return {SubmissionBounce} The submission bounce object.
  */
 function createSubissionBounce(props) {
@@ -55,7 +57,8 @@ function createSubissionBounce(props) {
     DaysSinceSubmission: elapsed,
     Author: props.author.username,
     Reason: props.reason || 'Unknown',
-    Message: props.message || ''
+    Message: props.message || '',
+    IsRejection: props.rejected || false
   };
 }
 
@@ -78,16 +81,18 @@ function createSubissionBounce(props) {
  * Create a submission object, wrapping a Gitlab Issue or Merge Request.
  *
  * @param {Object} props - Submission properties.
- * @param {Object} props.webhook - Webhook payload of the submission created.
+ * @param {Object} props.project - Gitlab Project object.
+ * @param {Object} props.author - Gitlab author object.
+ * @param {Object} props.submission - Gitlab submission payload.
  * @param {String} props.submissionType - Submission type, either "Issue" or
  *  "MergeRequest".
  * @return {Submission} The submission object.
  */
 function createSubmission(props) {
-  var project = props.webhook.project;
-  var author = props.webhook.user;
-  var submission = props.webhook.object_attributes;
-  var projectPath = project.path_with_namespace;
+  // var project = props.webhook.project;
+  // var author = props.webhook.user;
+  // var submission = props.webhook.object_attributes;
+  var projectPath = props.project.path_with_namespace;
   var projectGroup = projectPath.split('/')[0];
 
   return {
@@ -95,13 +100,13 @@ function createSubmission(props) {
     ProjectPath: projectPath,
     ProjectGroup: projectGroup,
     SubmissionType: props.submissionType,
-    Timestamp: submission.created_at,
-    SubmissionDate: submission.created_at,
-    Title: submission.title,
-    Url: submission.url,
-    Author: author.username
+    Timestamp: props.submission.created_at,
+    SubmissionDate: props.submission.created_at,
+    Title: props.submission.title,
+    Url: props.submission.url,
+    Author: props.author.username
   };
 }
 
-exports.createSubissionBounce = createSubissionBounce;
+exports.createSubmissionBounce = createSubissionBounce;
 exports.createSubmission = createSubmission;
