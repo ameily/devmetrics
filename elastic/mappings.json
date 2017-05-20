@@ -40,6 +40,9 @@
       "Title": {
         "type": "string",
         "index": "not_analyzed"
+      },
+      "IsRejection": {
+        "type": "boolean"
       }
     }
   },
