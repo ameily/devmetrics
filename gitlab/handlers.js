@@ -23,6 +23,9 @@ var BOUNCE_ACTIONS = [{
 }, {
   reason: 'Quality needs improvement',
   pattern: /^\\quality\b(.*)$/
+}, {
+  reason: 'Rejected',
+  pattern: /^\\reject\b(.*)$/
 }];
 var REJECT_PATTERN = /^\\reject\b(.*)$/;
 
@@ -84,20 +87,20 @@ function handleNote(webhook) {
 
   var note = webhook.object_attributes;
   if(note.created_at != note.updated_at) {
-    return null;
+    return Promise.reject("note is not new");
   }
 
   if(!submission) {
-    return null;
+    return Promise.reject("note does not belong to an issue or merge request");
   }
 
   actions = parseActions(note.note);
 
   if(!actions.bounce.length && !actions.reject.length) {
-    return;
+    return Promise.reject("not does not contain any actions");
   }
 
-  api.getGitlabUser(submission.author_id).then(function(author) {
+  return api.getGitlabUser(submission.author_id).then(function(author) {
     var bounces = actions.bounce.map((bounce) => {
       return models.createSubissionBounce({
         note: note,
@@ -123,12 +126,14 @@ function handleNote(webhook) {
     if(rejects.length) {
       console.log("rejects: %s", rejects);
     }
+
+    return;
   });
 }
 
 function handleMergeRequest(webhook) {
   if(webhook.object_attributes.action != 'open') {
-    return;
+    return Promise.reject('merge request is not new');
   }
 
   var submission = models.createSubmission({
@@ -137,28 +142,33 @@ function handleMergeRequest(webhook) {
   });
   //TODO send to elastic
   console.log("submission: %s", submission);
+
+  return Promise.resolve();
 }
 
 function handleIssue(webhook) {
   if(webhook.object_attributes.action != 'open') {
-    return;
+    return Promise.reject('issue is not new');
   }
 
   var submission = models.createSubmission({
     webhook: webhook,
     submissionType: "Issue"
   });
-  console.log("submission: %s", submission);
+
+  return Promise.resolve();
 }
 
 function handleWebhook(body) {
   if(body.object_kind == 'note') {
-    handleNote(body);
+    return handleNote(body);
   } else if(body.object_kind == 'merge_request') {
-    handleMergeRequest(body);
+    return handleMergeRequest(body);
   } else if(body.object_kind == 'issue') {
-    handleIssue(body);
+    return handleIssue(body);
   }
+
+  return Promise.reject(`unexpected webhook type ${body.object_kind}`);
 }
 
 
