@@ -20,6 +20,7 @@
   "dependencies": {
     "convict": "^3.0.0",
     "moment": "^2.18.1",
+    "progress": "^2.0.0",
     "request": "^2.81.0",
     "request-promise-native": "^1.0.4",
     "url-join": "^2.0.1"
@@ -30,6 +31,8 @@
     "eslint": "^3.19.0",
     "mocha": "^3.4.1",
     "nyc": "^10.3.2",
-    "rewire": "^2.5.2"
+    "rewire": "^2.5.2",
+    "sinon": "^2.2.0",
+    "sinon-chai": "^2.10.0"
   }
 }
