@@ -1,3 +1,5 @@
+var request = require('request-promise-native');
+
 /**
  * Query the Gitlab server for a specific user id.
  *
