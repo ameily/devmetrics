@@ -25,9 +25,9 @@ var BOUNCE_ACTIONS = [{
   pattern: /^\\quality\b(.*)$/
 }, {
   reason: 'Rejected',
-  pattern: /^\\reject\b(.*)$/
+  pattern: /^\\reject\b(.*)$/,
+  rejection: true
 }];
-var REJECT_PATTERN = /^\\reject\b(.*)$/;
 
 /**
  * Actions to perform on a submission.
@@ -53,8 +53,7 @@ var REJECT_PATTERN = /^\\reject\b(.*)$/;
  */
 function parseActions(text) {
   var actions = {
-    bounce: [],
-    reject: []
+    bounce: []
   };
 
   text.split('\n').forEach((line) => {
@@ -63,17 +62,11 @@ function parseActions(text) {
       if(match) {
         actions.bounce.push({
           reason: bounceAction.reason,
-          message: match[1].trim()
+          message: match[1].trim(),
+          rejection: bounceAction.rejection || false
         });
       }
     });
-
-    var match = REJECT_PATTERN.exec(line);
-    if(match) {
-      actions.reject.push({
-        message: match[1].trim()
-      });
-    }
   });
 
   return actions;
