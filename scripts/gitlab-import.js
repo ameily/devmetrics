@@ -1,9 +1,11 @@
 
 var request = require('request-promise-native');
 var urljoin = require('url-join');
-var models = require('../models');
 var fs = require('fs');
 var ProgressBar = require('progress');
+var program = require('commander');
+
+var models = require('../models');
 
 
 var ASSIGNMENT_PATTERN = /assigned to @(\w+)\b/i;
@@ -252,8 +254,30 @@ function run(opts) {
 }
 
 
+program
+  .version('0.1.0')
+  .option('-g, --gitlab <server>', 'gitlab server address')
+  .option('-k, --key <token>', 'gitlab private token')
+  .option('-p, --project <path>', 'gitlab project path with namespace/group')
+  .parse(process.argv);
+
+if(!program.gitlab) {
+  console.error('gitlab-import: error: -g/--gitlab required');
+  program.help();
+}
+
+if(!program.key) {
+  console.error('gitlab-import: error: -k/--key required');
+  program.help();
+}
+
+if(!program.project) {
+  console.error('gitlab-import: error: -p/--project required');
+  program.help();
+}
+
 run({
-  server: 'https://gitlab.ais',
-  projectPath: 'metasponse/metasponse-core',
-  apiKey: 'kTQ1aiZCbtxsx6tQzjs9'
+  server: program.gitlab,
+  apiKey: program.key,
+  projectPath: program.project
 });
