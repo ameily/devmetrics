@@ -1,3 +1,18 @@
+/**
+ * Elasticsearch data models for:
+ *
+ *  - Submissions - Items that were submitted by a user. This currently only
+ *    includes Gitlab issues and merge requests.
+ *
+ *  - Submission Bounces - Events where a Submission was reassigned to the
+ *    original submission author or the submission was permanently rejected. A
+ *    bounce event occurs when the author needs to take some action to resolve
+ *    inconsistencies or problems with the code submission.
+ *
+ * @copyright Adam Meily <meily.adam@gmail.com> 2017
+ * @license BSD 2-Clause
+ */
+
 var moment = require('moment');
 
 var MS_PER_DAY = 86400000;
