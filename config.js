@@ -1,3 +1,10 @@
+/**
+ * devmetrics configuration.
+ *
+ * @copyright Adam Meily <meily.adam@gmail.com> 2017
+ * @license BSD 2-Clause
+ */
+
 var convict = require('convict');
 var config = convict({
   gitlab: {

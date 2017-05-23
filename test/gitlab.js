@@ -1,3 +1,9 @@
+/**
+ * Gitlab test cases.
+ *
+ * @copyright Adam Meily <meily.adam@gmail.com> 2017
+ * @license BSD 2-Clause
+ */
 
 var rewire = require('rewire');
 var handlers = rewire('../gitlab/handlers');

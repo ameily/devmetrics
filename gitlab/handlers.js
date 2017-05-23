@@ -1,5 +1,9 @@
-
-
+/**
+ * Gitlab webhook handler.
+ *
+ * @copyright Adam Meily <meily.adam@gmail.com> 2017
+ * @license BSD 2-Clause
+ */
 
 
 var config = require('../config');
@@ -10,19 +14,24 @@ var api = require('./api');
 
 var BOUNCE_ACTIONS = [{
   reason: "Needs more information",
-  pattern: /^\\needs-info\b(.*)$/
+  pattern: /^\\needs-info\b(.*)$/,
+  rejection: false
 }, {
   reason: "Incomplete",
-  pattern: /^\\incomplete\b(.*)$/
+  pattern: /^\\incomplete\b(.*)$/,
+  rejection: false
 }, {
   reason: "Contains bug",
-  pattern: /^\\bug\b(.*)$/
+  pattern: /^\\bug\b(.*)$/,
+  rejection: false
 }, {
   reason: "Needs redesign",
-  pattern: /^\\redesign\b(.*)$/
+  pattern: /^\\redesign\b(.*)$/,
+  rejection: false
 }, {
   reason: 'Quality needs improvement',
-  pattern: /^\\quality\b(.*)$/
+  pattern: /^\\quality\b(.*)$/,
+  rejection: false
 }, {
   reason: 'Rejected',
   pattern: /^\\reject\b(.*)$/,
@@ -73,7 +82,12 @@ function parseActions(text) {
 }
 
 
-
+/**
+ * Handle a Gitlab Note webhook.
+ *
+ * @param {Object} webhook - The webhook payload.
+ * @return {Promise}
+ */
 function handleNote(webhook) {
   var submission = webhook.merge_request || webhook.issue;
   var actions;
@@ -124,14 +138,22 @@ function handleNote(webhook) {
   });
 }
 
+/**
+ * Handle Gitlab merge request webhook.
+ *
+ * @param {Object} webhook - Gitlab merge request webhook payload.
+ * @return {Promise}
+ */
 function handleMergeRequest(webhook) {
   if(webhook.object_attributes.action != 'open') {
     return Promise.reject('merge request is not new');
   }
 
   var submission = models.createSubmission({
-    webhook: webhook,
-    submissionType: "MergeRequest"
+    submission: webhook.object_attributes,
+    author: webhook.user,
+    project: webhook.project,
+    submissionType: 'MergeRequest'
   });
   //TODO send to elastic
   console.log("submission: %s", submission);
@@ -139,19 +161,33 @@ function handleMergeRequest(webhook) {
   return Promise.resolve();
 }
 
+/**
+ * Handle Gitlab issue webhook.
+ *
+ * @param {Object} webhook - Gitlab issue webhook payload.
+ * @return {Promise}
+ */
 function handleIssue(webhook) {
   if(webhook.object_attributes.action != 'open') {
     return Promise.reject('issue is not new');
   }
 
   var submission = models.createSubmission({
-    webhook: webhook,
+    submission: webhook.object_attributes,
+    author: webhook.user,
+    project: webhook.project,
     submissionType: "Issue"
   });
 
   return Promise.resolve();
 }
 
+/**
+ * Handle Gitlab webhook.
+ *
+ * @param {Object} body - Gitlab webhook payload.
+ * @return {Promise}
+ */
 function handleWebhook(body) {
   if(body.object_kind == 'note') {
     return handleNote(body);

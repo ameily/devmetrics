@@ -1,3 +1,9 @@
+/**
+ * Script to import Gitlab history into the devmetrics Elastic database.
+ *
+ * @copyright Adam Meily <meily.adam@gmail.com> 2017
+ * @license BSD 2-Clause
+ */
 
 var request = require('request-promise-native');
 var urljoin = require('url-join');
@@ -14,9 +20,10 @@ var CLOSED_PATTERN = /\bclosed\b/;
 /**
  * Retrieve all objects from Gitlab at a URL.
  *
- * @param {String} url
- * @param {String} apiKey
- * @param {Boolean} showProgress
+ * @param {String} url - Gitlab URL for REST api.
+ * @param {String} apiKey - Gitlab private token.
+ * @param {Boolean} showProgress - show progress bar.
+ * @return {Promise} - A promise that resolves to the array of REST api objects.
  */
 function getAllObjects(url, apiKey, showProgress) {
   var page = 0;
@@ -83,6 +90,13 @@ function getAllObjects(url, apiKey, showProgress) {
   return getPageResults().then(getNextPage);
 }
 
+/**
+ * Get a single object from the Gitlab REST api.
+ *
+ * @param {String} url - Gitlab full REST api URL.
+ * @param {String} apiKey - Gitlab private token.
+ * @return {Promise} - A promise that resolves the object retrieved from Gitlab.
+ */
 function getSingleObject(url, apiKey) {
   return request({
     url: url,
@@ -94,6 +108,15 @@ function getSingleObject(url, apiKey) {
   });
 }
 
+/**
+ * Get all merge requests from Gitlab.
+ *
+ * @param {String} server - The base Gitlab server URL.
+ * @param {String} projectPath - The URL-safe Gitlab project path.
+ * @param {String} project - The Gitlab project object (retrieved via REST api).
+ * @param {String} apiKey - The Gitlab private token.
+ * @return {Promise} - A promise that resolves to the list of merge requests.
+ */
 function getMergeRequests(server, projectPath, project, apiKey) {
   var url = urljoin(server, `api/v4/projects/${projectPath}/merge_requests`);
   console.log('getting merge requests');
@@ -127,6 +150,13 @@ function getMergeRequests(server, projectPath, project, apiKey) {
   });
 }
 
+/**
+ * Get all issues from Gitlab.
+ *
+ * @param {String} server - The base Gitlab URL.
+ * @param {String} projectPath - The URL-safe Gitlab project path.
+ * @param {String} apiKey - The Gitlab private token.
+ */
 function getIssues(server, projectPath, apiKey) {
   var url = urljoin(server, `api/v4/projects/${projectPath}/issues`);
   return getAllObjects(url, apiKey, true);
@@ -182,6 +212,14 @@ function processMergeRequest(mergeRequest) {
 }
 
 
+/**
+ * Import Gitlab history into Elastic.
+ *
+ * @param {Object} opts - Program options.
+ * @param {String} opts.projectPath - Gitlab project path.
+ * @param {String} opts.server - The Gitlab base URL.
+ * @param {String} opts.apiKey - The Gitlab REST api private token.
+ */
 function run(opts) {
   var payloads = [];
   var projectPathUrlSafe = opts.projectPath.replace('/', '%2f');
@@ -192,12 +230,11 @@ function run(opts) {
 
   getSingleObject(projectUrl, opts.apiKey).then(function(prj) {
     // Get the Gitlab project
-    console.log('found project: %d', prj.id);
+    console.log('found project: #%d', prj.id);
     project = prj;
     return getMergeRequests(opts.server, projectPathUrlSafe, project, opts.apiKey);
   }).then(function(mergeRequests) {
     // Get the Gitlab merge requests
-    // console.log('!! %d merge requests!', mergeRequests.length);
     console.log('processing %d merge requests', mergeRequests.length);
     var progress = new ProgressBar('[:bar] :percent', {
       total: mergeRequests.length,
@@ -226,7 +263,6 @@ function run(opts) {
 
     issues.forEach(function(issue) {
       // Process each issue
-      // console.log('issue: %s', issue);
       var submission = models.createSubmission({
         submission: issue,
         author: issue.author,
@@ -241,7 +277,7 @@ function run(opts) {
 
     return Promise.resolve(payloads);
   }).then(function() {
-    console.log('payload length: %d', payloads.length);
+    // console.log('payload length: %d', payloads.length);
     var output = payloads.map(function(obj) {
       return JSON.stringify(obj);
     }).join('\n');

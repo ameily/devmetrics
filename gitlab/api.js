@@ -1,3 +1,10 @@
+/**
+ * Gitlab REST api.
+ *
+ * @copyright Adam Meily <meily.adam@gmail.com> 2017
+ * @license BSD 2-Clause
+ */
+
 var request = require('request-promise-native');
 
 /**
