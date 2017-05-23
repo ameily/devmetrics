@@ -78,12 +78,12 @@ describe('handleMergeRequest', function() {
   var ignoreNames = ['assign', 'close', 'commit', 'merge', 'update'];
   var handleMergeRequest = handlers.__get__('handleMergeRequest');
   var sandbox = sinon.sandbox.create();
-  var createSubmission, getGitlabUser;
+  var createSubmission;
 
   beforeEach(function () {
     // stub out the `hello` method
     createSubmission = sandbox.stub(models, 'createSubmission');
-    getGitlabUser = sandbox.stub(api, 'getGitlabUser').resolves({
+    sandbox.stub(api, 'getGitlabUser').resolves({
       username: "test"
     });
   });
@@ -103,17 +103,17 @@ describe('handleMergeRequest', function() {
 
       handleMergeRequest(webhook).then(function() {
         throw new Error('handleMergeRequest was supposed to fail');
-      }).catch(function(err) {
+      }).catch(function() {
         expect(createSubmission.called).to.be.false;
       });
     });
   });
 
   it('creates submission from merge request', function() {
-    var jsonPath = path.join(__dirname, 'data', 'gitlab', 'webhooks',
-                             'merge-request-submit.json');
-    var content = fs.readFileSync(jsonPath, 'utf8');
-    var webhook = JSON.parse(content);
+    // var jsonPath = path.join(__dirname, 'data', 'gitlab', 'webhooks',
+                            //  'merge-request-submit.json');
+    // var content = fs.readFileSync(jsonPath, 'utf8');
+    // var webhook = JSON.parse(content);
 
 
   });

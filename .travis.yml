@@ -3,6 +3,6 @@ node_js:
   - "4"
   - "node"
 script:
-  - eslint .
+  - npm run lint
   - npm test
 after_success: npm run coverage

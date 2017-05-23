@@ -6,9 +6,9 @@
  */
 
 
-var config = require('../config');
-var urljoin = require('url-join');
-var request = require('request-promise-native');
+// var config = require('../config');
+// var urljoin = require('url-join');
+// var request = require('request-promise-native');
 var models = require('../models');
 var api = require('./api');
 
@@ -172,6 +172,7 @@ function handleIssue(webhook) {
     return Promise.reject('issue is not new');
   }
 
+  // TODO send to elastic
   var submission = models.createSubmission({
     submission: webhook.object_attributes,
     author: webhook.user,
@@ -179,7 +180,7 @@ function handleIssue(webhook) {
     submissionType: "Issue"
   });
 
-  return Promise.resolve();
+  return Promise.resolve(submission);
 }
 
 /**

@@ -195,7 +195,7 @@ function processMergeRequest(mergeRequest) {
     match = CLOSED_PATTERN.exec(note.body);
     if(match && mergeRequest.state == 'closed') {
       // console.log('closed issue');
-      var bounce = models.createSubmissionBounce({
+      var reject = models.createSubmissionBounce({
         submissionType: 'MergeRequest',
         note: note,
         project: mergeRequest.project,
@@ -204,7 +204,7 @@ function processMergeRequest(mergeRequest) {
         reason: 'Unknown',
         rejection: true
       });
-      results.push(bounce);
+      results.push(reject);
     }
   });
 

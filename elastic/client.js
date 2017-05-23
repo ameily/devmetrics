@@ -5,7 +5,9 @@
  * @license BSD 2-Clause
  */
 
-var elastic = require('elastic');
+// var elastic = require('elastic');
+var fs = require('fs');
+var path = require('path');
 
 /**
  * Elasticsearch interface.
@@ -56,6 +58,8 @@ class ElasticClient {
    *  been confirmed or updated.
    */
   ensureMappingsExists() {
+    var self = this;
+
     this.client.getMapping({
       index: this.index
     }, function(err, res) {
@@ -110,3 +114,4 @@ class ElasticClient {
 }
 
 
+module.exports = ElasticClient;
