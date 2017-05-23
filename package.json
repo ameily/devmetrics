@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/ameily/devmetrics#readme",
   "dependencies": {
+    "commander": "^2.9.0",
     "convict": "^3.0.0",
+    "elasticsearch": "^13.0.1",
     "moment": "^2.18.1",
     "progress": "^2.0.0",
     "request": "^2.81.0",
