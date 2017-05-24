@@ -36,6 +36,7 @@ var MS_PER_DAY = 86400000;
  * @prop {String} Author - Submission author's username.
  * @prop {String} Reason - Reason for the bounce.
  * @prop {String} Message - The supplied message describing the bounce.
+ * @prop {Boolean} IsRejection - The submission is rejected.
  */
 
 /**
@@ -67,13 +68,62 @@ function createSubissionBounce(props) {
     SubmissionType: props.submissionType,
     Timestamp: props.note.created_at,
     Title: props.submission.title,
-    Url: props.note.url,
+    Url: props.note.url || props.submission.url,
     SubmissionDate: props.submission.created_at,
     DaysSinceSubmission: elapsed,
     Author: props.author.username,
     Reason: props.reason || 'Unknown',
     Message: props.message || '',
     IsRejection: props.rejected || false
+  };
+}
+
+/**
+ * A submission merge signifying that the submission was accepted.
+ *
+ * @typedef {Object} SubmissionMerge
+ * @prop {String} _type - Elastic search type name (always "SubmissionMerge").
+ * @prop {String} ProjectPath - The Gitlab project path (group/project-name).
+ * @prop {String} ProjectGroup - The Gitlab project group.
+ * @prop {String} SubmissionType - The submission type.
+ * @prop {String} Title - Submission title.
+ * @prop {String} Url - Gitlab submission URL.
+ * @prop {String} Timestamp - ISO 8601 formatted creation date for the note.
+ * @prop {String} SubmissionDate - ISO 8601 formatted creation date for the
+ *  submission.
+ * @prop {Number} DaysSinceSubmission - Number of days since the submission was
+ *  created.
+ * @prop {String} Author - Submission author's username.
+ */
+
+/**
+ * Create a submission merge object.
+ *
+ * @param {Object} props - Submission bounce properties.
+ * @param {Object} props.project - Gitlab project object.
+ * @param {Object} props.submission - Gitlab submission object (either the
+ *  Gitlab issue or merge request).
+ * @param {Object} props.author - Gitlab author (user) information.
+ * @param {String} props.submissionType - The submission type, either "Issue" or
+ *  "MergeRequest".
+ * @return {SubmissionBounce} The submission merge object.
+ */
+function createSubissionMerge(props) {
+  var projectPath = props.project.path_with_namespace;
+  var projectGroup = projectPath.split('/')[0];
+  var elapsed = moment(props.note.created_at).diff(moment(props.submission.created_at)) / MS_PER_DAY;
+
+  return {
+    _type: 'SubmissionBounce',
+    ProjectPath: projectPath,
+    ProjectGroup: projectGroup,
+    SubmissionType: props.submissionType,
+    Timestamp: props.note.created_at,
+    Title: props.submission.title,
+    Url: props.submission.url,
+    SubmissionDate: props.submission.created_at,
+    DaysSinceSubmission: elapsed,
+    Author: props.author.username
   };
 }
 
@@ -125,3 +175,4 @@ function createSubmission(props) {
 
 exports.createSubmissionBounce = createSubissionBounce;
 exports.createSubmission = createSubmission;
+exports.createSubissionMerge = createSubissionMerge;

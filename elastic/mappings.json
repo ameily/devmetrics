@@ -47,6 +47,44 @@
     }
   },
 
+  "SubmissionMerge": {
+    "properties": {
+      "ProjectPath": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "ProjectGroup": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "SubmissionType": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "Url": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "Author": {
+        "type": "text",
+        "index": "not_analyzed"
+      },
+      "SubmissionDate": {
+        "type": "date"
+      },
+      "DaysSinceSubmission": {
+        "type": "double"
+      },
+      "Timestamp": {
+        "type": "date"
+      },
+      "Title": {
+        "type": "string",
+        "index": "not_analyzed"
+      }
+    }
+  },
+
   "Submission": {
     "properties": {
       "ProjectPath": {
