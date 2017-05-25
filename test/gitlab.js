@@ -14,6 +14,11 @@ var sinon = require('sinon');
 var fs = require('fs');
 var models = require('../models');
 
+function loadWebhookJson(name) {
+  var jpath = path.join(__dirname, 'data', 'gitlab', 'webhooks', name);
+  return JSON.parse(fs.readFileSync(jpath, 'utf8'));
+}
+
 
 describe('parseActions', function() {
   var ACTION_COMMANDS = {
@@ -74,8 +79,8 @@ describe('parseActions', function() {
   });
 });
 
-describe('handleMergeRequest', function() {
-  var ignoreNames = ['assign', 'close', 'commit', 'merge', 'update'];
+describe('handleMergeRequest(ignore)', function() {
+  var ignoreNames = ['assign', 'close', 'commit', 'update'];
   var handleMergeRequest = handlers.__get__('handleMergeRequest');
   var sandbox = sinon.sandbox.create();
   var createSubmission;
@@ -95,11 +100,7 @@ describe('handleMergeRequest', function() {
 
   ignoreNames.forEach(function(ignoreName) {
     it(`ignores ${ignoreName}`, function() {
-      // var createSubmission = sinon.stub(models, 'createSubmission');
-      var jsonPath = path.join(__dirname, 'data', 'gitlab', 'webhooks',
-                               `merge-request-${ignoreName}.json`);
-      var content = fs.readFileSync(jsonPath, 'utf8');
-      var webhook = JSON.parse(content);
+      var webhook = loadWebhookJson(`merge-request-${ignoreName}.json`);
 
       handleMergeRequest(webhook).then(function() {
         throw new Error('handleMergeRequest was supposed to fail');
@@ -108,13 +109,39 @@ describe('handleMergeRequest', function() {
       });
     });
   });
+});
+
+describe('handleMergeRequest', function() {
+  var handleMergeRequest = handlers.__get__('handleMergeRequest');
+  var sandbox = sinon.sandbox.create();
+
+  beforeEach(function () {
+    // stub out the `hello` method
+    sandbox.stub(api, 'getGitlabUser').resolves({
+      username: "test"
+    });
+  });
+
+  afterEach(function () {
+    // completely restore all fakes created through the sandbox
+    sandbox.restore();
+  });
 
   it('creates submission from merge request', function() {
-    // var jsonPath = path.join(__dirname, 'data', 'gitlab', 'webhooks',
-                            //  'merge-request-submit.json');
-    // var content = fs.readFileSync(jsonPath, 'utf8');
-    // var webhook = JSON.parse(content);
-
-
+    var webhook = loadWebhookJson('merge-request-submit.json');
+    handleMergeRequest(webhook).then(function(items) {
+      expect(items).deep.equal([{
+        SubmissionType: 'MergeRequest',
+        Author: 'test',
+        Timestamp: webhook.object_attributes.created_at,
+        SubmissionDate: webhook.object_attributes.created_at,
+        ProjectPath: webhook.project.path_with_namespace,
+        ProjectGroup: webhook.project.namespace,
+        Url: webhook.object_attributes.url,
+        Title: webhook.object_attributes.title
+      }]);
+    }).catch(function(err) {
+      throw new Error(`failed to create submission from merge request: ${err}`);
+    });
   });
 });

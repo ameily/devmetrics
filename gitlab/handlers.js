@@ -158,7 +158,7 @@ function handleMergeRequest(webhook) {
   //TODO send to elastic
   console.log("submission: %s", submission);
 
-  return Promise.resolve();
+  return Promise.resolve([submission]);
 }
 
 /**
@@ -180,7 +180,7 @@ function handleIssue(webhook) {
     submissionType: "Issue"
   });
 
-  return Promise.resolve(submission);
+  return Promise.resolve([submission]);
 }
 
 /**
